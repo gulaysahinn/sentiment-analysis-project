@@ -24,11 +24,13 @@ Analiz sonuçlarını grafikle görselleştirir ve static klasörüne kaydeder.
 
 Formdan gelen metni alır ve analiz eder.
 
-Analiz sonuçlarını ve grafiği döner.
-![image](https://github.com/user-attachments/assets/24b6141d-90fe-4bbc-a89c-89d03886b9da)
-Analiz etmek istediğimiz metnin analiz sonuçları gözükür
-![image](https://github.com/user-attachments/assets/2d9df854-8702-4b7d-afec-f66450577d17)
-Duygu skorları ile seaborn ve matplotlib ile duygu grafiği oluşturulur
-![image](https://github.com/user-attachments/assets/1f69c76d-0d37-48fa-8eee-cfe413e0e536)
+* Analiz sonuçlarını ve grafiği döner.
+* Analiz ettiğimiz cümle ekranda gözükür<br/>
+![image](https://github.com/user-attachments/assets/24b6141d-90fe-4bbc-a89c-89d03886b9da)<br/>
+* Analiz etmek istediğimiz metnin analiz sonuçları gözükür<br/>
+![image](https://github.com/user-attachments/assets/2d9df854-8702-4b7d-afec-f66450577d17)<br/>
+* Duygu skorları ile seaborn ve matplotlib ile duygu grafiği oluşturulur<br/>
+![image](https://github.com/user-attachments/assets/b2800a8d-c20f-462e-bea0-e976e635f9a7)<br/>
+
 
 
