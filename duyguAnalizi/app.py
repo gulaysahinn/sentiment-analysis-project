@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, send_from_directory
+from flask import Flask, render_template, request
 from nltk.sentiment import SentimentIntensityAnalyzer
 from deep_translator import GoogleTranslator
 import matplotlib.pyplot as plt
@@ -16,6 +16,9 @@ logging.basicConfig(level=logging.INFO)
 app = Flask(__name__)
 sia = SentimentIntensityAnalyzer()
 
+# "Korku" ile ilişkili kelimeler listesi
+FEAR_KEYWORDS = ["korku", "korkutucu", "endişe", "panik", "dehşet", "kaygı"]
+
 # Türkçe metni İngilizceye çeviren fonksiyon
 def translate_turkish_to_english(text):
     try:
@@ -31,20 +34,29 @@ def sentiment_analyzer_and_plot(text):
 
     # Eğer çeviri sırasında hata oluştuysa
     if "Çeviri sırasında hata oluştu" in translated_text:
-        return translated_text, {'pos': 0, 'neu': 0, 'neg': 0}
+        return translated_text, {'pos': 0, 'neu': 0, 'neg': 0, 'fear': 0}
 
     # VADER ile duygu analizi yap
     sentiment_scores = sia.polarity_scores(translated_text)
     logging.info(f"Sentiment Scores: {sentiment_scores}")
 
+    # "Korku" analizini metin üzerinde kontrol et
+    fear_score = any(keyword in text.lower() for keyword in FEAR_KEYWORDS)
+    sentiment_scores['fear'] = 1 if fear_score else 0
+
     # Duygu analiz sonuçlarını görselleştir
-    labels = ['Pozitif', 'Nötr', 'Negatif']
-    values = [sentiment_scores['pos'], sentiment_scores['neu'], sentiment_scores['neg']]
+    labels = ['Pozitif', 'Nötr', 'Negatif', 'Korku']
+    values = [
+        sentiment_scores['pos'],
+        sentiment_scores['neu'],
+        sentiment_scores['neg'],
+        sentiment_scores['fear']
+    ]
 
     # Seaborn ile grafik oluşturma
     plt.figure(figsize=(6, 4))
     sns.set_style("whitegrid")  # Stil ayarı
-    sns.barplot(x=labels, y=values, palette=['green', 'gray', 'red'])
+    sns.barplot(x=labels, y=values, palette=['green', 'gray', 'red', 'purple'])
     plt.title('Duygu Analizi Sonuçları')
     plt.ylabel('Skor')
     plt.ylim(0, 1)
@@ -58,7 +70,9 @@ def sentiment_analyzer_and_plot(text):
     plt.close()  # Grafiği kapat
 
     # Compound skoruna göre duygu etiketi
-    if sentiment_scores['compound'] >= 0.05:
+    if sentiment_scores['fear'] == 1:
+        sentiment = "korku"
+    elif sentiment_scores['compound'] >= 0.05:
         sentiment = "pozitif"
     elif sentiment_scores['compound'] <= -0.05:
         sentiment = "negatif"
@@ -69,8 +83,9 @@ def sentiment_analyzer_and_plot(text):
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
+    text = ""
     sentiment = ""
-    scores = {'pos': 0, 'neu': 0, 'neg': 0}
+    scores = {'pos': 0, 'neu': 0, 'neg': 0, 'fear': 0}
     if request.method == 'POST':
         text = request.form['text']
         logging.info(f"Received text: {text}")
@@ -84,7 +99,7 @@ def index():
                 sentiment, sentiment_scores = sentiment_analyzer_and_plot(text)
                 scores = sentiment_scores
             except Exception as e:
-                logging.error(f"Error during sentiment analysis: {e}")
+                logging.error(f"Duyarlılık analizi sırasında hata oluştu: {e}")
                 sentiment = "Duygu analizi sırasında bir hata oluştu."
 
     return render_template('index.html', sentiment=sentiment, scores=scores)
