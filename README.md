@@ -1,4 +1,4 @@
-Bu Python kodu, Flask web framework'ü kullanarak bir web uygulaması oluşturur. Uygulama, Türkçe metinlerde duygu analizi yapar ve sonuçları grafiklerle görselleştirir. İşte adım adım açıklaması:
+Bu Python Projesinin amacı, Flask web framework'ü kullanarak bir web uygulaması oluşturur. Uygulama, Türkçe metinlerde duygu analizi yapar ve sonuçları grafiklerle görselleştirir. İşte adım adım açıklaması:
 
 Gerekli Kütüphaneler ve Ayarlar:
 
