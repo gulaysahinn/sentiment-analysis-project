@@ -7,16 +7,17 @@ import os
 import nltk
 import logging
 
-# Gerekli NLTK sözlüğünü indir
+# Gerekli NLTK sözlüğünü indiren kod parçası
 nltk.download('vader_lexicon')
 
-# Loglama ayarları
+# Loglama ayarları yapılıyor
 logging.basicConfig(level=logging.INFO)
 
+# Flask uygulaması oluşturuluyor
 app = Flask(__name__)
 sia = SentimentIntensityAnalyzer()
 
-# "Korku" ile ilişkili kelimeler listesi
+# "Korku" ile ilişkili kelimelerin listesini verdik korku için daha hassas bir analiz yapabilmek için
 FEAR_KEYWORDS = ["korku", "korkutucu", "endişe", "panik", "dehşet", "kaygı"]
 
 # Türkçe metni İngilizceye çeviren fonksiyon
@@ -26,25 +27,25 @@ def translate_turkish_to_english(text):
     except Exception as e:
         return f"Çeviri sırasında hata oluştu: {e}"
 
-# Duygu analizi ve grafik oluşturma fonksiyonu
+# Duygu analizi ve grafik oluşturma fonksiyonu oluşturuluyor
 def sentiment_analyzer_and_plot(text):
     # Metni İngilizceye çevir
     translated_text = translate_turkish_to_english(text)
     logging.info(f"Translated Text: {translated_text}")
 
-    # Eğer çeviri sırasında hata oluştuysa
+    # Eğer çeviri sırasında hata oluştuysa hata mesajını döndür
     if "Çeviri sırasında hata oluştu" in translated_text:
         return translated_text, {'pos': 0, 'neu': 0, 'neg': 0, 'fear': 0}
 
-    # VADER ile duygu analizi yap
+    # VADER ile duygu analizi yap ve sonuçları al
     sentiment_scores = sia.polarity_scores(translated_text)
     logging.info(f"Sentiment Scores: {sentiment_scores}")
 
-    # "Korku" analizini metin üzerinde kontrol et
+    # "Korku" analizini metin üzerinde kontrol et ve sonucu kaydet
     fear_score = any(keyword in text.lower() for keyword in FEAR_KEYWORDS)
     sentiment_scores['fear'] = 1 if fear_score else 0
 
-    # Duygu analiz sonuçlarını görselleştir
+    # Duygu analiz sonuçlarını görselleştir ve kaydet
     labels = ['Pozitif', 'Nötr', 'Negatif', 'Korku']
     values = [
         sentiment_scores['pos'],
@@ -53,7 +54,7 @@ def sentiment_analyzer_and_plot(text):
         sentiment_scores['fear']
     ]
 
-    # Seaborn ile grafik oluşturma
+    # Seaborn ile grafik oluşturma ve kaydetme
     plt.figure(figsize=(6, 4))
     sns.set_style("whitegrid")  # Stil ayarı
     sns.barplot(x=labels, y=values, palette=['green', 'gray', 'red', 'purple'])
@@ -61,15 +62,15 @@ def sentiment_analyzer_and_plot(text):
     plt.ylabel('Skor')
     plt.ylim(0, 1)
 
-    # Statik dosya dizinini kontrol et
+    # Statik dosya dizinini kontrol et ve oluştur
     if not os.path.exists('static'):
         os.makedirs('static')
 
-    # Grafiği kaydet
+    # Grafiği kaydet ve dosya adını döndür
     plt.savefig('static/sentiment_analysis.png')
     plt.close()  # Grafiği kapat
 
-    # Compound skoruna göre duygu etiketi
+    # Compound skoruna göre duygu etiketi belirle
     if sentiment_scores['fear'] == 1:
         sentiment = "korku"
     elif sentiment_scores['compound'] >= 0.05:
@@ -81,6 +82,8 @@ def sentiment_analyzer_and_plot(text):
 
     return sentiment, sentiment_scores
 
+
+# Ana sayfa için route oluşturuluyor ve metin alınıyor ve analiz ediliyor
 @app.route('/', methods=['GET', 'POST'])
 def index():
     text = ""
@@ -104,5 +107,6 @@ def index():
 
     return render_template('index.html', sentiment=sentiment, scores=scores)
 
+# Uygulamayı çalıştır
 if __name__ == '__main__':
     app.run(debug=True)

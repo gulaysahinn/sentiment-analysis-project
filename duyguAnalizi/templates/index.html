@@ -26,7 +26,7 @@
         {% if request.method == 'POST' and 'text' in request.form %}
             <div class="entered-text mb-3">
                 <label for="text" class="form-label">Analiz Edilen Metin:</label>
-                <textarea class="form-control"  rows="5" required readonly>{{ request.form['text'] }}</textarea>
+                <div class="box" style="background-color: ##e9ecef;">{{ request.form['text'] }}</div>
             </div>
         {% endif %}
         {% if sentiment %}
