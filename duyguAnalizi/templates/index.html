@@ -26,18 +26,22 @@
         {% if request.method == 'POST' and 'text' in request.form %}
             <div class="entered-text mb-3">
                 <label for="text" class="form-label">Analiz Edilen Metin:</label>
-                <div class="box" style="background-color: ##e9ecef;">{{ request.form['text'] }}</div>
+                <div class="box" style="background-color: #e9ecef;">{{ request.form['text'] }}</div>
             </div>
         {% endif %}
         {% if sentiment %}
             <div class="result mt-4">
                 <h3>Analiz Sonuçları:</h3>
                 <p>Duygu Durumu: <strong>{{ sentiment }}</strong></p>
-                <p>Pozitif Skor: {{ scores.pos }}</p>
-                <p>Nötr Skor: {{ scores.neu }}</p>
-                <p>Negatif Skor: {{ scores.neg }}</p>
-                <p>Korku Skoru: {{ scores.fear }}</p>
-                <img src="{{ url_for('static', filename='sentiment_analysis.png') }}" alt="Duygu Analizi Grafiği" class="img-fluid mt-3">
+                {% if scores %}
+                    <h4>Duygu Skorları:</h4>
+                    <ul>
+                        {% for label, score in scores.items() %}
+                            <li>{{ label }}: {{ score | round(2) }}</li>
+                        {% endfor %}
+                    </ul>
+                    <img src="{{ url_for('static', filename='sentiment_analysis.png') }}" alt="Duygu Analizi Grafiği" class="img-fluid mt-3">
+                {% endif %}
             </div>
         {% endif %}
     </div>
